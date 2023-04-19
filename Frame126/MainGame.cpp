@@ -2,7 +2,7 @@
 #include "MainGame.h"
 #include "Player.h"
 #include "Monster.h"
-
+#include "Tank.h"
 CMainGame::CMainGame()
 	: m_pPlayer(nullptr), m_pMonster(nullptr)
 {
@@ -29,21 +29,29 @@ void CMainGame::Initialize(void)
 		m_pMonster->Initialize();
 	}
 
+	if (!m_pTank)
+	{
+		m_pTank = new CTank;
+		m_pTank->Initialize();
+	}
+
 	dynamic_cast<CMonster*>(m_pMonster)->Set_Player(m_pPlayer);
 }
 
 void CMainGame::Update(void)
 {
-	m_pPlayer->Update();
-	m_pMonster->Update();
+	//m_pPlayer->Update();
+	//m_pMonster->Update();
+	m_pTank->Update();
 }
 
 void CMainGame::Render(void)
 {
 	Rectangle(m_DC, 0, 0, WINCX, WINCY);
 	
-	m_pPlayer->Render(m_DC);
-	m_pMonster->Render(m_DC);
+	//m_pPlayer->Render(m_DC);
+	//m_pMonster->Render(m_DC);
+	m_pTank->Render(m_DC);
 }
 
 void CMainGame::Release(void)

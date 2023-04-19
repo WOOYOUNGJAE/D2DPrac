@@ -19,5 +19,6 @@ private:
 	HDC			m_DC;
 	CObj*		m_pPlayer;
 	CObj*		m_pMonster;
+	CObj*		m_pTank;
 };
 
