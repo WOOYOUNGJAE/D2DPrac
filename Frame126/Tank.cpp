@@ -2,7 +2,7 @@
 #include "Tank.h"
 
 CTank::CTank() : m_fPosinAngle(0.f), m_fBodyAngle(0.f),
-m_fWidth(90.f)
+m_fBodyRadius(60.f), m_fPosinLength(120.f)
 {
 	D3DXMatrixIdentity(&matWorld);
 	D3DXMatrixIdentity(&matTranslation);
@@ -16,15 +16,36 @@ CTank::~CTank()
 void CTank::Initialize()
 {
 	m_tInfo.vPos = D3DXVECTOR3(WINCX >> 1, WINCY >> 1, 0);
+	vNewPos = m_tInfo.vPos;
+
+	vBodyDots[0] = D3DXVECTOR3(
+		vNewPos.x - m_fBodyRadius * 0.5f,
+		vNewPos.y - m_fBodyRadius * 0.5f, 0);
+
+	vBodyDots[1] = D3DXVECTOR3(
+		vNewPos.x + m_fBodyRadius * 0.5f,
+		vNewPos.y - m_fBodyRadius * 0.5f,
+		0
+	);
+	vBodyDots[2] = D3DXVECTOR3(
+		vNewPos.x - m_fBodyRadius * 0.5f,
+		vNewPos.y + m_fBodyRadius * 0.5f,
+		0
+	);
+	vBodyDots[3] = D3DXVECTOR3(
+		vNewPos.x + m_fBodyRadius * 0.5f,
+		vNewPos.y + m_fBodyRadius * 0.5f,
+		0
+	);
 }
 
 void CTank::Update()
 {
 	Key_Input();
 
-	UpdatePos();
-
-	UpdateBodyDots(); // UpdateRect
+	//UpdatePos();
+	UpdateRotation();
+	//UpdateBodyDots(); // UpdateRect
 }
 
 void CTank::Render(HDC hDC)
@@ -38,8 +59,11 @@ void CTank::Render(HDC hDC)
 		(int)vBodyDots[3].y);
 	LineTo(hDC, (int)vBodyDots[2].x,
 		(int)vBodyDots[2].y);
-	LineTo(hDC, (int)vBodyDots[0].x,
++	LineTo(hDC, (int)vBodyDots[0].x,
 		(int)vBodyDots[0].y);
+
+	MoveToEx(hDC, (int)m_tInfo.vPos.x, (int)m_tInfo.vPos.y, nullptr);
+	LineTo(hDC, (int)vPosinDot.x, (int)vPosinDot.y);
 }
 
 void CTank::Release()
@@ -48,18 +72,44 @@ void CTank::Release()
 
 void CTank::UpdateRotation()
 {
-	m_fBodyAngle += 1.f;
-	m_fBodyAngle = D3DXToRadian(m_fBodyAngle);
+#pragma region Body
+ 	//m_fBodyAngle += 1.f;
+	m_fBodyAngle += D3DXToRadian(1);
 
-	D3DXMatrixIdentity(&matRotation);
-	// z축 회전
+	// z축 회전 변환 행렬
+	D3DXMatrixTranslation(&matTranslation, m_tInfo.vPos.x, m_tInfo.vPos.y, 0);
 	D3DXMatrixRotationZ(&matRotation, m_fBodyAngle);
-	matFinal *= matRotation;
+
+	vBodyDots[0] = { -m_fBodyRadius, -m_fBodyRadius,0 };
+	vBodyDots[1] = { m_fBodyRadius, -m_fBodyRadius ,0 };
+	vBodyDots[2] = { -m_fBodyRadius, +m_fBodyRadius,0 };
+	vBodyDots[3] = { +m_fBodyRadius, +m_fBodyRadius,0 };
+
+	matFinal = matTranslation * matRotation;
 
 	// 3차원 행렬을 4차원으로
-	D3DXVec3TransformCoord(&vToFour, &m_tInfo.vPos, &matToFour);
-
+	D3DXVec3TransformCoord(vBodyDots, vBodyDots, &matRotation);
+	D3DXVec3TransformCoord(vBodyDots + 1, vBodyDots + 1, &matRotation);
+	D3DXVec3TransformCoord(vBodyDots + 2, vBodyDots + 2, &matRotation);
+	D3DXVec3TransformCoord(vBodyDots + 3, vBodyDots + 3, &matRotation);
 	
+	D3DXVec3TransformCoord(vBodyDots, vBodyDots, &matTranslation);
+	D3DXVec3TransformCoord(vBodyDots + 1, vBodyDots + 1, &matTranslation);
+	D3DXVec3TransformCoord(vBodyDots + 2, vBodyDots + 2, &matTranslation);
+	D3DXVec3TransformCoord(vBodyDots + 3, vBodyDots + 3, &matTranslation);
+#pragma endregion Body
+
+#pragma region Posin
+	m_fPosinAngle += D3DXToRadian(-1);
+	D3DXMatrixTranslation(&matTranslation, m_tInfo.vPos.x, m_tInfo.vPos.y, 0);
+	D3DXMatrixRotationZ(&matRotation, m_fPosinAngle);
+
+	vPosinDot = { m_fPosinLength, 0, 0 };
+	D3DXVec3TransformCoord(&vPosinDot, &vPosinDot, &matRotation);
+	D3DXVec3TransformCoord(&vPosinDot, &vPosinDot, &matTranslation);
+
+#pragma endregion Posin
+
 
 }
 
@@ -80,22 +130,22 @@ void CTank::UpdateBodyDots()
 {
 	// left top right bottom
 	vBodyDots[0] = D3DXVECTOR3(
-		m_tInfo.vPos.x - m_fWidth * 0.5f,
-		m_tInfo.vPos.y - m_fWidth * 0.5f, 0);
+		vNewPos.x - m_fBodyRadius * 0.5f,
+		vNewPos.y - m_fBodyRadius * 0.5f, 0);
 
 	vBodyDots[1] = D3DXVECTOR3(
-		m_tInfo.vPos.x + m_fWidth * 0.5f,
-		m_tInfo.vPos.y - m_fWidth * 0.5f,
+		vNewPos.x + m_fBodyRadius * 0.5f,
+		vNewPos.y - m_fBodyRadius * 0.5f,
 		0
 		);
 	vBodyDots[2] = D3DXVECTOR3(
-		m_tInfo.vPos.x - m_fWidth * 0.5f,
-		m_tInfo.vPos.y + m_fWidth * 0.5f,
+		vNewPos.x - m_fBodyRadius * 0.5f,
+		vNewPos.y + m_fBodyRadius * 0.5f,
 		0
 		);
 	vBodyDots[3] = D3DXVECTOR3(
-		m_tInfo.vPos.x + m_fWidth * 0.5f,
-		m_tInfo.vPos.y + m_fWidth * 0.5f,
+		vNewPos.x + m_fBodyRadius * 0.5f,
+		vNewPos.y + m_fBodyRadius * 0.5f,
 		0
 		);
 }

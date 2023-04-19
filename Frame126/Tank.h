@@ -20,9 +20,11 @@ private:
 	void		Key_Input(void);
 
 	D3DXVECTOR3 vBodyDots[4];
+	D3DXVECTOR3 vPosinDot;
 	float m_fPosinAngle;
 	float m_fBodyAngle;
-	float m_fWidth;
+	float m_fBodyRadius;
+	float m_fPosinLength;
 
 	D3DXMATRIX matWorld;
 	D3DXMATRIX matFinal;
@@ -30,6 +32,7 @@ private:
 	D3DXMATRIX matRotation;
 
 	D3DXVECTOR3 vToFour;
+	D3DXVECTOR3 vNewPos;
 	D3DXMATRIX matToFour;
 };
 
