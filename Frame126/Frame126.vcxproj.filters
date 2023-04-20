@@ -28,6 +28,9 @@
     <Filter Include="01. Obj\01. Monster">
       <UniqueIdentifier>{1690f32e-bf1d-4f83-be40-a57236d49f21}</UniqueIdentifier>
     </Filter>
+    <Filter Include="BrickOut">
+      <UniqueIdentifier>{db868fea-606b-41aa-854e-fe1d125ce106}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <Text Include="ReadMe.txt" />
@@ -72,6 +75,33 @@
     <ClInclude Include="Tank.h">
       <Filter>헤더 파일</Filter>
     </ClInclude>
+    <ClInclude Include="KeyMgr.h">
+      <Filter>헤더 파일</Filter>
+    </ClInclude>
+    <ClInclude Include="Player_WYJ.h">
+      <Filter>BrickOut</Filter>
+    </ClInclude>
+    <ClInclude Include="Obj_WYJ.h">
+      <Filter>BrickOut</Filter>
+    </ClInclude>
+    <ClInclude Include="CollisionManager_WYJ.h">
+      <Filter>BrickOut</Filter>
+    </ClInclude>
+    <ClInclude Include="Enum_WYJ.h">
+      <Filter>BrickOut</Filter>
+    </ClInclude>
+    <ClInclude Include="ObjManager_WYJ.h">
+      <Filter>BrickOut</Filter>
+    </ClInclude>
+    <ClInclude Include="BrickWall.h">
+      <Filter>BrickOut</Filter>
+    </ClInclude>
+    <ClInclude Include="BrickBase.h">
+      <Filter>BrickOut</Filter>
+    </ClInclude>
+    <ClInclude Include="Ball_WYJ.h">
+      <Filter>헤더 파일</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp">
@@ -93,6 +123,30 @@
       <Filter>01. Obj\01. Monster</Filter>
     </ClCompile>
     <ClCompile Include="Tank.cpp">
+      <Filter>소스 파일</Filter>
+    </ClCompile>
+    <ClCompile Include="KeyMgr.cpp">
+      <Filter>소스 파일</Filter>
+    </ClCompile>
+    <ClCompile Include="Player_WYJ.cpp">
+      <Filter>BrickOut</Filter>
+    </ClCompile>
+    <ClCompile Include="Obj_WYJ.cpp">
+      <Filter>BrickOut</Filter>
+    </ClCompile>
+    <ClCompile Include="CollisionManager_WYJ.cpp">
+      <Filter>BrickOut</Filter>
+    </ClCompile>
+    <ClCompile Include="ObjManager_WYJ.cpp">
+      <Filter>BrickOut</Filter>
+    </ClCompile>
+    <ClCompile Include="BrickWall.cpp">
+      <Filter>BrickOut</Filter>
+    </ClCompile>
+    <ClCompile Include="BrickBase.cpp">
+      <Filter>BrickOut</Filter>
+    </ClCompile>
+    <ClCompile Include="Ball_WYJ.cpp">
       <Filter>소스 파일</Filter>
     </ClCompile>
   </ItemGroup>

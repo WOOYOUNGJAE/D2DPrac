@@ -151,13 +151,22 @@
     <Text Include="ReadMe.txt" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="Ball_WYJ.h" />
+    <ClInclude Include="BrickBase.h" />
+    <ClInclude Include="BrickWall.h" />
+    <ClInclude Include="CollisionManager_WYJ.h" />
     <ClInclude Include="Define.h" />
+    <ClInclude Include="Enum_WYJ.h" />
     <ClInclude Include="Frame126.h" />
     <ClInclude Include="Include.h" />
+    <ClInclude Include="KeyMgr.h" />
     <ClInclude Include="MainGame.h" />
     <ClInclude Include="Monster.h" />
     <ClInclude Include="Obj.h" />
+    <ClInclude Include="ObjManager_WYJ.h" />
+    <ClInclude Include="Obj_WYJ.h" />
     <ClInclude Include="Player.h" />
+    <ClInclude Include="Player_WYJ.h" />
     <ClInclude Include="Resource.h" />
     <ClInclude Include="stdafx.h" />
     <ClInclude Include="Struct.h" />
@@ -166,11 +175,19 @@
     <ClInclude Include="TempFunctor.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="Ball_WYJ.cpp" />
+    <ClCompile Include="BrickBase.cpp" />
+    <ClCompile Include="BrickWall.cpp" />
+    <ClCompile Include="CollisionManager_WYJ.cpp" />
     <ClCompile Include="Frame126.cpp" />
+    <ClCompile Include="KeyMgr.cpp" />
     <ClCompile Include="MainGame.cpp" />
     <ClCompile Include="Monster.cpp" />
     <ClCompile Include="Obj.cpp" />
+    <ClCompile Include="ObjManager_WYJ.cpp" />
+    <ClCompile Include="Obj_WYJ.cpp" />
     <ClCompile Include="Player.cpp" />
+    <ClCompile Include="Player_WYJ.cpp" />
     <ClCompile Include="stdafx.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Create</PrecompiledHeader>

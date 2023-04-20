@@ -3,6 +3,7 @@
 #include "Player.h"
 #include "Monster.h"
 #include "Tank.h"
+#include "Player_WYJ.h"
 CMainGame::CMainGame()
 	: m_pPlayer(nullptr), m_pMonster(nullptr)
 {
@@ -35,6 +36,12 @@ void CMainGame::Initialize(void)
 		m_pTank->Initialize();
 	}
 
+	if (!m_pPlayerWYJ)
+	{
+		m_pPlayerWYJ = new CPlayer_WYJ;
+		m_pPlayerWYJ->Initialize();
+	}
+
 	dynamic_cast<CMonster*>(m_pMonster)->Set_Player(m_pPlayer);
 }
 
@@ -43,6 +50,8 @@ void CMainGame::Update(void)
 	//m_pPlayer->Update();
 	//m_pMonster->Update();
 	m_pTank->Update();
+
+	m_pPlayerWYJ->Update();
 }
 
 void CMainGame::Render(void)
@@ -51,7 +60,8 @@ void CMainGame::Render(void)
 	
 	//m_pPlayer->Render(m_DC);
 	//m_pMonster->Render(m_DC);
-	m_pTank->Render(m_DC);
+	//m_pTank->Render(m_DC);
+	m_pPlayerWYJ->Render(m_DC);
 }
 
 void CMainGame::Release(void)
