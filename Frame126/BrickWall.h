@@ -4,6 +4,6 @@ class CBrickWall : public CBrickBase
 {
 public:
 	CBrickWall();
-	virtual ~CBrickWall() override;
+	virtual ~CBrickWall() override = default;
 };
 

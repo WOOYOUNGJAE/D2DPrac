@@ -33,7 +33,9 @@ public:
 	void OBBCollisionExit(list<CObj_WYJ*> _Dst, list<CObj_WYJ*> _Src);
 
 	bool CheckRect(CObj_WYJ* _pDst, CObj_WYJ* _pSrc, float* pDiffCX, float* pDiffCY);
+	bool CheckRect(CObj_WYJ* _pDst, CObj_WYJ* _pSrc);
 
+	bool SAT_Exist(const D3DXVECTOR3& _vNormal, CObj_WYJ* _pDst, CObj_WYJ* _pSrc);
 	
 private:
 	static CCollisionManager_WYJ* m_pInstance;

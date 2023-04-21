@@ -2,7 +2,7 @@
 #include "Obj_WYJ.h"
 
 CObj_WYJ::CObj_WYJ() : m_fSpeed(0.f), m_fDeltaAngle(0.f), m_fDeltaScale(1.f),
-m_eID(OBJ_ID_WYJ_END), m_bAlive(true)
+m_eID(OBJ_ID_WYJ_END), m_bAlive(true), m_fOBBWidth(0.f), m_fOBBHeight(0.f), m_bIsRectangle(true)
 {
 	D3DXMatrixIdentity(&m_tMats.matWorld);
 	D3DXMatrixIdentity(&m_tMats.matScale);
@@ -36,13 +36,23 @@ bool CObj_WYJ::Update()
 	return true; // alive
 }
 
+void CObj_WYJ::LateUpdate()
+{
+	LateUpdateOBB();
+}
+
 void CObj_WYJ::Render(HDC hDC)
 {
-	MoveToEx(hDC, m_vRectDots[0].x, m_vRectDots[0].y, nullptr);
-	LineTo(hDC, m_vRectDots[1].x, m_vRectDots[1].y);
-	LineTo(hDC, m_vRectDots[3].x, m_vRectDots[3].y);
-	LineTo(hDC, m_vRectDots[2].x, m_vRectDots[2].y);
-	LineTo(hDC, m_vRectDots[0].x, m_vRectDots[0].y);
+
+
+
+
+	()
+	MoveToEx(hDC, m_vDots[0].x, m_vDots[0].y, nullptr);
+	LineTo(hDC, m_vDots[1].x, m_vDots[1].y);
+	LineTo(hDC, m_vDots[2].x, m_vDots[2].y);
+	LineTo(hDC, m_vDots[3].x, m_vDots[3].y);
+	LineTo(hDC, m_vDots[0].x, m_vDots[0].y);
 }
 
 void CObj_WYJ::UpdateWorldTransform(int _option)
@@ -82,9 +92,9 @@ void CObj_WYJ::UpdateWorldTransform(int _option)
 	
 	ResetDotsPos();
 	// 4개의 점 이동
-	for (int i = 0; i < 4; ++i)
+	for (int i = 0; i < DOT_COUNT; ++i)
 	{
-		D3DXVec3TransformCoord(m_vRectDots + i, m_vRectDots + i,
+		D3DXVec3TransformCoord(m_vDots + i, m_vDots + i,
 			&m_tMats.matWorld);
 	}
 }
@@ -125,8 +135,31 @@ void CObj_WYJ::UpdateMove()
 
 void CObj_WYJ::ResetDotsPos()
 {
-	m_vRectDots[0] = { -0.5f, -0.5f, 0 };
-	m_vRectDots[1] = { 0.5f, -0.5f, 0 };
-	m_vRectDots[2] = { -0.5f, 0.5f, 0 };
-	m_vRectDots[3] = { 0.5f, 0.5f, 0 };
+	m_vDots[0] = { -0.5f, -0.5f, 0 };
+	m_vDots[1] = { 0.5f, -0.5f, 0 };
+	m_vDots[2] = { 0.5f, 0.5f, 0 };
+	m_vDots[3] = { -0.5f, 0.5f, 0 };
+}
+
+void CObj_WYJ::LateUpdateOBB()
+{
+	float fCurrentMinX = m_vDots[0].x;
+	float fCurrentMaxX = m_vDots[0].x;
+	float fCurrentMinY = m_vDots[0].y;
+	float fCurrentMaxY = m_vDots[0].y;
+	for (int i = 0; i < DOT_COUNT; ++i)
+	{
+		if (m_vDots[i].x < fCurrentMinX)
+			fCurrentMinX = m_vDots[i].x;
+		else if (m_vDots[i].x > fCurrentMaxX)
+			fCurrentMaxX = m_vDots[i].x;
+
+		if (m_vDots[i].y < fCurrentMinY)
+			fCurrentMinY = m_vDots[i].y;
+		else if (m_vDots[i].y > fCurrentMaxY)
+			fCurrentMaxY = m_vDots[i].y;
+	}
+
+	m_fOBBWidth = fabs(fCurrentMaxX - fCurrentMinX);
+	m_fOBBHeight = fabs(fCurrentMaxY - fCurrentMinY);
 }

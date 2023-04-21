@@ -141,7 +141,115 @@ void CCollisionManager_WYJ::RectCollisionExit(list<CObj_WYJ*> _Dst, list<CObj_WY
 
 void CCollisionManager_WYJ::OBBCollisionStay(list<CObj_WYJ*> _Dst, list<CObj_WYJ*> _Src)
 {
+	for (auto& Dst : _Dst)
+	{
+		for (auto& Src : _Src)
+		{
+			if (CheckRect(Dst, Src))
+			{
+				// OBB Collision Check
+				int iDotCount = 0;
+				const D3DXVECTOR3* pTmpDots = Dst->Get_Dots(&iDotCount);
+				D3DXVECTOR3 vLine{};
 
+				// 01
+				vLine = pTmpDots[1] - pTmpDots[0];
+				vLine = D3DXVECTOR3(-vLine.y, vLine.x, 0);
+				if (SAT_Exist(vLine, Dst, Src))
+					continue;
+				// 32
+				vLine = pTmpDots[2] - pTmpDots[3];
+				vLine = D3DXVECTOR3(-vLine.y, vLine.x, 0);
+				if (SAT_Exist(vLine, Dst, Src))
+					continue;
+
+				pTmpDots = Src->Get_Dots(&iDotCount);
+				// 01
+				vLine = pTmpDots[1] - pTmpDots[0];
+				vLine = D3DXVECTOR3(-vLine.y, vLine.x, 0);
+				if (SAT_Exist(vLine, Src, Dst))
+					continue;
+				// 32
+				vLine = pTmpDots[2] - pTmpDots[3];
+				vLine = D3DXVECTOR3(-vLine.y, vLine.x, 0);
+				if (SAT_Exist(vLine, Src, Dst))
+					continue;
+
+				if (Dst->Get_IsRectangle())
+				{
+					// 둘 다 직사각형이면
+					if (Src->Get_IsRectangle())
+					{
+						Src->OnCollisionStay();
+						Dst->OnCollisionStay();
+						continue;
+					}
+					else // Dst만 직사각형이면
+					{
+						// 03
+						vLine = pTmpDots[3] - pTmpDots[0];
+						vLine = D3DXVECTOR3(-vLine.y, vLine.x, 0);
+						if (SAT_Exist(vLine, Src, Dst))
+							continue;
+						// 12
+						vLine = pTmpDots[2] - pTmpDots[1];
+						vLine = D3DXVECTOR3(-vLine.y, vLine.x, 0);
+						if (SAT_Exist(vLine, Src, Dst))
+							continue;
+					}
+				}
+				else if (Src->Get_IsRectangle()) // Src만 직사각형이면
+				{
+					// Dst 추가검사
+
+					pTmpDots = Dst->Get_Dots(&iDotCount);
+					// 03
+					vLine = pTmpDots[3] - pTmpDots[0];
+					vLine = D3DXVECTOR3(-vLine.y, vLine.x, 0);
+					if (SAT_Exist(vLine, Dst, Src))
+						continue;
+					// 12
+					vLine = pTmpDots[2] - pTmpDots[1];
+					vLine = D3DXVECTOR3(-vLine.y, vLine.x, 0);
+					if (SAT_Exist(vLine, Dst, Src))
+						continue;
+				}
+				else // 둘 다 직사각형이 아니라면
+				{
+					// Dst 추가검사
+					pTmpDots = Dst->Get_Dots(&iDotCount);
+					// 03
+					vLine = pTmpDots[3] - pTmpDots[0];
+					vLine = D3DXVECTOR3(-vLine.y, vLine.x, 0);
+					if (SAT_Exist(vLine, Dst, Src))
+						continue;
+					// 12
+					vLine = pTmpDots[2] - pTmpDots[1];
+					vLine = D3DXVECTOR3(-vLine.y, vLine.x, 0);
+					if (SAT_Exist(vLine, Dst, Src))
+						continue;
+
+					// Src 추가검사
+					pTmpDots = Src->Get_Dots(&iDotCount);
+					// 03
+					vLine = pTmpDots[3] - pTmpDots[0];
+					vLine = D3DXVECTOR3(-vLine.y, vLine.x, 0);
+					if (SAT_Exist(vLine, Src, Dst))
+						continue;
+					// 12
+					vLine = pTmpDots[2] - pTmpDots[1];
+					vLine = D3DXVECTOR3(-vLine.y, vLine.x, 0);
+					if (SAT_Exist(vLine, Src, Dst))
+						continue;
+				}
+
+
+				// 다 통과하면
+				Src->OnCollisionStay();
+				Dst->OnCollisionStay();
+			}
+		}
+	}
 }
 
 void CCollisionManager_WYJ::OBBCollisionEnter(list<CObj_WYJ*> _Dst, list<CObj_WYJ*> _Src)
@@ -169,4 +277,25 @@ bool CCollisionManager_WYJ::CheckRect(CObj_WYJ* _pDst, CObj_WYJ* _pSrc, float* p
 	}
 
 	return false;
+}
+
+bool CCollisionManager_WYJ::CheckRect(CObj_WYJ* _pDst, CObj_WYJ* _pSrc)
+{
+	float fWidth = fabs(_pDst->Get_WorldPos().x - _pSrc->Get_WorldPos().x);
+	float fHeight = fabs(_pDst->Get_WorldPos().y - _pSrc->Get_WorldPos().y);
+
+	float fRadiusX = (_pDst->Get_OBBWidth() + _pSrc->Get_OBBWidth()) * 0.5f;
+	float fRadiusY = (_pDst->Get_OBBHeight() + _pSrc->Get_OBBHeight()) * 0.5f;
+
+	if ((fRadiusX >= fWidth) && (fRadiusY >= fHeight))
+	{
+		return  true;
+	}
+
+	return false;
+}
+
+bool CCollisionManager_WYJ::SAT_Exist(const D3DXVECTOR3& _vNormal, CObj_WYJ* _pDst, CObj_WYJ* _pSrc)
+{
+
 }
