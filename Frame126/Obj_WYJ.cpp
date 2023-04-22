@@ -43,11 +43,6 @@ void CObj_WYJ::LateUpdate()
 
 void CObj_WYJ::Render(HDC hDC)
 {
-
-
-
-
-	()
 	MoveToEx(hDC, m_vDots[0].x, m_vDots[0].y, nullptr);
 	LineTo(hDC, m_vDots[1].x, m_vDots[1].y);
 	LineTo(hDC, m_vDots[2].x, m_vDots[2].y);
@@ -111,7 +106,7 @@ void CObj_WYJ::UpdateWorldScale()
 
 void CObj_WYJ::UpdateWorldRotation()
 {
-	D3DXMatrixRotationZ(&m_tMats.matRotation, m_fDeltaAngle);
+	D3DXMatrixRotationZ(&m_tMats.matRotation, D3DXToRadian(m_fDeltaAngle));
 
 	m_tMats.matWorld *= m_tMats.matRotation;
 }

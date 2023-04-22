@@ -1,7 +1,11 @@
 #include "stdafx.h"
 #include "MainGame.h"
+
+#include "Ball_WYJ.h"
+#include "BrickWall.h"
 #include "Player.h"
 #include "Monster.h"
+#include "ObjManager_WYJ.h"
 #include "Tank.h"
 #include "Player_WYJ.h"
 CMainGame::CMainGame()
@@ -40,18 +44,32 @@ void CMainGame::Initialize(void)
 	{
 		m_pPlayerWYJ = new CPlayer_WYJ;
 		m_pPlayerWYJ->Initialize();
+		CObjManager_WYJ::Get_Instance()->AddObject(OBJ_WYJ_BALL, m_pBall);
+	}
+	if (!m_pBall)
+	{
+		m_pBall = new CBall_WYJ;
+		m_pBall->Initialize();
+		CObjManager_WYJ::Get_Instance()->AddObject(OBJ_WYJ_BALL, m_pBall);
 	}
 
-	dynamic_cast<CMonster*>(m_pMonster)->Set_Player(m_pPlayer);
+	CObj_WYJ* pTmpObj = new CBrickWall;
+	pTmpObj->Initialize();
+	pTmpObj->Set_WorldPos(WINCX >> 1, 50);
+	pTmpObj->Set_WorldScale(WINCX - 100, 100);
+	CObjManager_WYJ::Get_Instance()->AddObject(OBJ_WYJ_WALL, pTmpObj);
+	
 }
 
 void CMainGame::Update(void)
 {
 	//m_pPlayer->Update();
 	//m_pMonster->Update();
-	m_pTank->Update();
+	//m_pTank->Update();
 
-	m_pPlayerWYJ->Update();
+	//m_pPlayerWYJ->Update();
+	CObjManager_WYJ::Get_Instance()->Update();
+	CObjManager_WYJ::Get_Instance()->LateUpdate();
 }
 
 void CMainGame::Render(void)
@@ -61,7 +79,8 @@ void CMainGame::Render(void)
 	//m_pPlayer->Render(m_DC);
 	//m_pMonster->Render(m_DC);
 	//m_pTank->Render(m_DC);
-	m_pPlayerWYJ->Render(m_DC);
+	//m_pPlayerWYJ->Render(m_DC);
+	CObjManager_WYJ::Get_Instance()->Render(m_DC);
 }
 
 void CMainGame::Release(void)

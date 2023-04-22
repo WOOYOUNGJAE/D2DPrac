@@ -63,7 +63,17 @@ public:
 
 	virtual const float Get_OBBWidth() { return m_fOBBWidth; }
 	virtual const float Get_OBBHeight() { return m_fOBBHeight; }
-public:
+
+	//setter
+	virtual void Set_WorldPos(const D3DXVECTOR3& _vPos) { m_tWorld.vPos.x = _vPos.x; m_tWorld.vPos.y = _vPos.y; }
+	virtual void Set_WorldPos(const float _x, const float _y)
+	{ m_tWorld.vPos.x = _x; m_tWorld.vPos.y = _y; }
+	virtual void Set_WorldScale(const float _x, const float _y)
+	{
+		m_tWorld.vScale.x = _x;
+		m_tWorld.vScale.y = _y;
+	}
+
 	virtual void		Initialize(void)PURE;
 	virtual bool		Update(void);
 	virtual void		LateUpdate(void);

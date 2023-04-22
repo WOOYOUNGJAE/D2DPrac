@@ -125,7 +125,7 @@ void CCollisionManager_WYJ::RectCollisionExit(list<CObj_WYJ*> _Dst, list<CObj_WY
 
 			// 못찾았으면,  리턴
 			if (iter == m_CollisionEnterList.end())
-				continue;;
+				continue;
 
 			// 충돌 안했으면
 			if (CheckRect(Dst, Src, &fDiffCX, &fDiffCY) == false)
@@ -145,6 +145,39 @@ void CCollisionManager_WYJ::OBBCollisionStay(list<CObj_WYJ*> _Dst, list<CObj_WYJ
 	{
 		for (auto& Src : _Src)
 		{
+			int iDotCount = 0;
+			const D3DXVECTOR3* pTmpDots = Dst->Get_Dots(&iDotCount);
+			D3DXVECTOR3 vLine{};
+
+			// 01
+			vLine = pTmpDots[1] - pTmpDots[0];
+			D3DXVec3Normalize(&vLine, &vLine);
+			if (SAT_Exist(vLine, Dst, Src))
+				continue;
+			// 32
+			vLine = pTmpDots[2] - pTmpDots[1];
+			D3DXVec3Normalize(&vLine, &vLine);
+			if (SAT_Exist(vLine, Dst, Src))
+				continue;
+
+			pTmpDots = Src->Get_Dots(&iDotCount);
+			// 01
+			vLine = pTmpDots[1] - pTmpDots[0];
+			D3DXVec3Normalize(&vLine, &vLine);
+			if (SAT_Exist(vLine, Src, Dst))
+				continue;
+			// 32
+			vLine = pTmpDots[2] - pTmpDots[1];
+			D3DXVec3Normalize(&vLine, &vLine);
+			if (SAT_Exist(vLine, Src, Dst))
+				continue;
+
+			Src->OnCollisionStay();
+			Dst->OnCollisionStay();
+			continue;
+
+			// ----------------SAT
+#pragma region SAT
 			if (CheckRect(Dst, Src))
 			{
 				// OBB Collision Check
@@ -243,10 +276,10 @@ void CCollisionManager_WYJ::OBBCollisionStay(list<CObj_WYJ*> _Dst, list<CObj_WYJ
 						continue;
 				}
 
-
 				// 다 통과하면
 				Src->OnCollisionStay();
 				Dst->OnCollisionStay();
+#pragma endregion SAT
 			}
 		}
 	}
@@ -295,7 +328,56 @@ bool CCollisionManager_WYJ::CheckRect(CObj_WYJ* _pDst, CObj_WYJ* _pSrc)
 	return false;
 }
 
-bool CCollisionManager_WYJ::SAT_Exist(const D3DXVECTOR3& _vNormal, CObj_WYJ* _pDst, CObj_WYJ* _pSrc)
+bool CCollisionManager_WYJ::SAT_Exist(const D3DXVECTOR3& _vAxis, CObj_WYJ* _pDst, CObj_WYJ* _pSrc)
 {
+	float fDstLength = 0.f;
+	float fSrcLength = 0.f;
+	float fDistance = 0.f;
+	int iDotCount = 0; // not used
+	const D3DXVECTOR3* pTmpDots = _pDst->Get_Dots(&iDotCount);
+	D3DXVECTOR3 vCenterToExtent{};
+	D3DXVECTOR3 vProjected{};
+	const D3DXVECTOR3 DstCenter = _pDst->Get_WorldPos();
+	const D3DXVECTOR3 SrcCenter = _pSrc->Get_WorldPos();
 
+
+	D3DXVECTOR3 vCenterToCenter = DstCenter - SrcCenter;
+
+	vProjected = 
+	 MyProjection(vCenterToCenter, _vAxis);
+
+	fDistance = D3DXVec3Length(&vProjected);
+
+	// Dst Center to Dot0
+	vCenterToExtent = pTmpDots[0] - DstCenter;
+	vProjected = MyProjection(vCenterToExtent, _vAxis);
+	fDstLength = D3DXVec3Length(&vProjected);
+	// Dst Center to Dot1
+	vCenterToExtent = pTmpDots[1] - DstCenter;
+	vProjected = MyProjection(vCenterToExtent, _vAxis);
+	if (D3DXVec3Length(&vProjected) > fDstLength)
+		fDstLength = D3DXVec3Length(&vProjected);
+
+
+	pTmpDots = _pSrc->Get_Dots(&iDotCount);
+	// Src Center to Src0
+	vCenterToExtent = pTmpDots[0] - SrcCenter;
+	vProjected = MyProjection(vCenterToExtent, _vAxis);
+	fSrcLength = D3DXVec3Length(&vProjected);
+	// Src Center to Dot1
+	vCenterToExtent = pTmpDots[1] - SrcCenter;
+	vProjected = MyProjection(vCenterToExtent, _vAxis);
+	if (D3DXVec3Length(&vProjected) > fSrcLength)
+		fSrcLength = D3DXVec3Length(&vProjected);
+
+
+	return fDistance > fDstLength + fSrcLength;
+}
+
+D3DXVECTOR3 CCollisionManager_WYJ::MyProjection(const D3DXVECTOR3 U, const D3DXVECTOR3 V)
+{
+	// v' = (u * v) * v
+	float UdotV = D3DXVec3Dot(&U, &V);
+	D3DXVECTOR3 result = UdotV * V;
+	return result;
 }

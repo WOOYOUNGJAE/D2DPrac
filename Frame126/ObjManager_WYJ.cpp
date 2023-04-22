@@ -48,6 +48,8 @@ void CObjManager_WYJ::LateUpdate()
 			(*iter)->LateUpdate();
 		}
 	}
+
+	CCollisionManager_WYJ::Get_Instance()->OBBCollisionStay(m_ObjList[OBJ_WYJ_BALL], m_ObjList[OBJ_WYJ_WALL]); 
 	
 }	
 

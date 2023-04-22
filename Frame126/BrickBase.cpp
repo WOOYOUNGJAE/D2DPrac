@@ -3,6 +3,7 @@
 
 CBrickBase::CBrickBase() : m_eType(BRICK_TYPE_END)
 {
+	m_eID = OBJ_WYJ_WALL;
 }
 
 CBrickBase::~CBrickBase()

@@ -29,6 +29,14 @@ public:
 
 	virtual void		UpdateMove() override;
 
+	void OnCollisionStay_Legacy(CObj_WYJ* _pOther, DIR_WYJ _eDir, float _fDiffCX, float _fDiffCY) override{}
+	void OnCollisionEnter_Legacy(CObj_WYJ* _pOther, DIR_WYJ _eDir, float _fDiffCX, float _fDiffCY) override{}
+	void OnCollisionExit_Legacy(CObj_WYJ* _pOther) override{}
+
+	void OnCollisionStay() override{};
+	void OnCollisionEnter() override{};
+	void OnCollisionExit() override{};
+
 
 protected:
 	BRICK_TYPE m_eType;

@@ -22,5 +22,6 @@ private:
 	CObj*		m_pTank;
 
 	CObj_WYJ* m_pPlayerWYJ;
+	CObj_WYJ* m_pBall;
 };
 
