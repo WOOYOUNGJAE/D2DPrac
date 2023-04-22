@@ -20,9 +20,9 @@ public:
 	virtual void OnCollisionEnter_Legacy(CObj_WYJ* _pOther, DIR_WYJ _eDir, float _fDiffCX, float _fDiffCY) override;
 	virtual void OnCollisionExit_Legacy(CObj_WYJ* _pOther) override;
 
-	virtual void OnCollisionStay() override {};
-	virtual void OnCollisionEnter() override {};
-	virtual void OnCollisionExit() override {};
+	virtual void OnCollisionStay(const D3DXVECTOR3* _vCollisionAxis) override {};
+	virtual void OnCollisionEnter(const D3DXVECTOR3* _vCollisionAxis) override {};
+	virtual void OnCollisionExit(const D3DXVECTOR3* _vCollisionAxis) override {};
 
 	virtual void		UpdateMove() override;
 

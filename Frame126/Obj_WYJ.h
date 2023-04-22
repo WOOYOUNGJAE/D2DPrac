@@ -84,9 +84,9 @@ public:
 	virtual void OnCollisionEnter_Legacy(CObj_WYJ* _pOther, DIR_WYJ _eDir, float _fDiffCX, float _fDiffCY)PURE;
 	virtual void OnCollisionExit_Legacy(CObj_WYJ* _pOther)PURE;
 
-	virtual void OnCollisionStay() PURE;
-	virtual void OnCollisionEnter() PURE;
-	virtual void OnCollisionExit() PURE;
+	virtual void OnCollisionStay(const D3DXVECTOR3* _vCollisionAxis) PURE;
+	virtual void OnCollisionEnter(const D3DXVECTOR3* _vCollisionAxis) PURE;
+	virtual void OnCollisionExit(const D3DXVECTOR3* _vCollisionAxis) PURE;
 
 
 	/**
@@ -136,7 +136,9 @@ protected:
 	float			m_fDeltaScale;
 
 	// OBB Collider
+	D3DXVECTOR3 m_vCollisionAxis;
 	float m_fOBBWidth;
 	float m_fOBBHeight;
+	
 };
 

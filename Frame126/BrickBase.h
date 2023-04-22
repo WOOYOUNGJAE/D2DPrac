@@ -33,9 +33,9 @@ public:
 	void OnCollisionEnter_Legacy(CObj_WYJ* _pOther, DIR_WYJ _eDir, float _fDiffCX, float _fDiffCY) override{}
 	void OnCollisionExit_Legacy(CObj_WYJ* _pOther) override{}
 
-	void OnCollisionStay() override{};
-	void OnCollisionEnter() override{};
-	void OnCollisionExit() override{};
+	void OnCollisionStay(const D3DXVECTOR3* _vCollisionAxis) override{};
+	void OnCollisionEnter(const D3DXVECTOR3* _vCollisionAxis) override{};
+	void OnCollisionExit(const D3DXVECTOR3* _vCollisionAxis) override{};
 
 
 protected:

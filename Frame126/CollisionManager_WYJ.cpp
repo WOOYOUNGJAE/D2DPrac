@@ -148,139 +148,36 @@ void CCollisionManager_WYJ::OBBCollisionStay(list<CObj_WYJ*> _Dst, list<CObj_WYJ
 			int iDotCount = 0;
 			const D3DXVECTOR3* pTmpDots = Dst->Get_Dots(&iDotCount);
 			D3DXVECTOR3 vLine{};
+			D3DXVECTOR3 vCollisionAxis{};
 
 			// 01
 			vLine = pTmpDots[1] - pTmpDots[0];
 			D3DXVec3Normalize(&vLine, &vLine);
-			if (SAT_Exist(vLine, Dst, Src))
+			if (SAT_Exist(vLine, Dst, Src, &vCollisionAxis))
 				continue;
 			// 32
 			vLine = pTmpDots[2] - pTmpDots[1];
 			D3DXVec3Normalize(&vLine, &vLine);
-			if (SAT_Exist(vLine, Dst, Src))
+			if (SAT_Exist(vLine, Dst, Src, &vCollisionAxis))
 				continue;
 
 			pTmpDots = Src->Get_Dots(&iDotCount);
 			// 01
 			vLine = pTmpDots[1] - pTmpDots[0];
 			D3DXVec3Normalize(&vLine, &vLine);
-			if (SAT_Exist(vLine, Src, Dst))
+			if (SAT_Exist(vLine, Src, Dst, &vCollisionAxis))
 				continue;
 			// 32
 			vLine = pTmpDots[2] - pTmpDots[1];
 			D3DXVec3Normalize(&vLine, &vLine);
-			if (SAT_Exist(vLine, Src, Dst))
+			if (SAT_Exist(vLine, Src, Dst, &vCollisionAxis))
 				continue;
 
-			Src->OnCollisionStay();
-			Dst->OnCollisionStay();
+			// 충돌 감지 순간
+			//Src->OnCollisionStay(TODO);
+			//Dst->OnCollisionStay(TODO);
 			continue;
 
-			// ----------------SAT
-#pragma region SAT
-			if (CheckRect(Dst, Src))
-			{
-				// OBB Collision Check
-				int iDotCount = 0;
-				const D3DXVECTOR3* pTmpDots = Dst->Get_Dots(&iDotCount);
-				D3DXVECTOR3 vLine{};
-
-				// 01
-				vLine = pTmpDots[1] - pTmpDots[0];
-				vLine = D3DXVECTOR3(-vLine.y, vLine.x, 0);
-				if (SAT_Exist(vLine, Dst, Src))
-					continue;
-				// 32
-				vLine = pTmpDots[2] - pTmpDots[3];
-				vLine = D3DXVECTOR3(-vLine.y, vLine.x, 0);
-				if (SAT_Exist(vLine, Dst, Src))
-					continue;
-
-				pTmpDots = Src->Get_Dots(&iDotCount);
-				// 01
-				vLine = pTmpDots[1] - pTmpDots[0];
-				vLine = D3DXVECTOR3(-vLine.y, vLine.x, 0);
-				if (SAT_Exist(vLine, Src, Dst))
-					continue;
-				// 32
-				vLine = pTmpDots[2] - pTmpDots[3];
-				vLine = D3DXVECTOR3(-vLine.y, vLine.x, 0);
-				if (SAT_Exist(vLine, Src, Dst))
-					continue;
-
-				if (Dst->Get_IsRectangle())
-				{
-					// 둘 다 직사각형이면
-					if (Src->Get_IsRectangle())
-					{
-						Src->OnCollisionStay();
-						Dst->OnCollisionStay();
-						continue;
-					}
-					else // Dst만 직사각형이면
-					{
-						// 03
-						vLine = pTmpDots[3] - pTmpDots[0];
-						vLine = D3DXVECTOR3(-vLine.y, vLine.x, 0);
-						if (SAT_Exist(vLine, Src, Dst))
-							continue;
-						// 12
-						vLine = pTmpDots[2] - pTmpDots[1];
-						vLine = D3DXVECTOR3(-vLine.y, vLine.x, 0);
-						if (SAT_Exist(vLine, Src, Dst))
-							continue;
-					}
-				}
-				else if (Src->Get_IsRectangle()) // Src만 직사각형이면
-				{
-					// Dst 추가검사
-
-					pTmpDots = Dst->Get_Dots(&iDotCount);
-					// 03
-					vLine = pTmpDots[3] - pTmpDots[0];
-					vLine = D3DXVECTOR3(-vLine.y, vLine.x, 0);
-					if (SAT_Exist(vLine, Dst, Src))
-						continue;
-					// 12
-					vLine = pTmpDots[2] - pTmpDots[1];
-					vLine = D3DXVECTOR3(-vLine.y, vLine.x, 0);
-					if (SAT_Exist(vLine, Dst, Src))
-						continue;
-				}
-				else // 둘 다 직사각형이 아니라면
-				{
-					// Dst 추가검사
-					pTmpDots = Dst->Get_Dots(&iDotCount);
-					// 03
-					vLine = pTmpDots[3] - pTmpDots[0];
-					vLine = D3DXVECTOR3(-vLine.y, vLine.x, 0);
-					if (SAT_Exist(vLine, Dst, Src))
-						continue;
-					// 12
-					vLine = pTmpDots[2] - pTmpDots[1];
-					vLine = D3DXVECTOR3(-vLine.y, vLine.x, 0);
-					if (SAT_Exist(vLine, Dst, Src))
-						continue;
-
-					// Src 추가검사
-					pTmpDots = Src->Get_Dots(&iDotCount);
-					// 03
-					vLine = pTmpDots[3] - pTmpDots[0];
-					vLine = D3DXVECTOR3(-vLine.y, vLine.x, 0);
-					if (SAT_Exist(vLine, Src, Dst))
-						continue;
-					// 12
-					vLine = pTmpDots[2] - pTmpDots[1];
-					vLine = D3DXVECTOR3(-vLine.y, vLine.x, 0);
-					if (SAT_Exist(vLine, Src, Dst))
-						continue;
-				}
-
-				// 다 통과하면
-				Src->OnCollisionStay();
-				Dst->OnCollisionStay();
-#pragma endregion SAT
-			}
 		}
 	}
 }

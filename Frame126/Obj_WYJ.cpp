@@ -16,6 +16,8 @@ m_eID(OBJ_ID_WYJ_END), m_bAlive(true), m_fOBBWidth(0.f), m_fOBBHeight(0.f), m_bI
 	
 	m_vMoveDir = { 0,0,0 };
 	ResetDotsPos();
+
+	m_vCollisionAxis = {};
 }
 
 CObj_WYJ::~CObj_WYJ()

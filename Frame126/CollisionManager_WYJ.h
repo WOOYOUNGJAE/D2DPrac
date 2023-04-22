@@ -35,7 +35,7 @@ public:
 	bool CheckRect(CObj_WYJ* _pDst, CObj_WYJ* _pSrc, float* pDiffCX, float* pDiffCY);
 	bool CheckRect(CObj_WYJ* _pDst, CObj_WYJ* _pSrc);
 
-	bool SAT_Exist(const D3DXVECTOR3& _vAxis, CObj_WYJ* _pDst, CObj_WYJ* _pSrc);
+	bool SAT_Exist(const D3DXVECTOR3& _vAxis, CObj_WYJ* _pDst, CObj_WYJ* _pSrc, D3DXVECTOR3* _pCollisionAxis);
 	D3DXVECTOR3 MyProjection(const D3DXVECTOR3 U, const D3DXVECTOR3 V);
 private:
 	static CCollisionManager_WYJ* m_pInstance;
