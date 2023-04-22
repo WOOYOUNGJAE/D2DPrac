@@ -84,9 +84,9 @@ public:
 	virtual void OnCollisionEnter_Legacy(CObj_WYJ* _pOther, DIR_WYJ _eDir, float _fDiffCX, float _fDiffCY)PURE;
 	virtual void OnCollisionExit_Legacy(CObj_WYJ* _pOther)PURE;
 
-	virtual void OnCollisionStay(const D3DXVECTOR3* _vCollisionAxis) PURE;
-	virtual void OnCollisionEnter(const D3DXVECTOR3* _vCollisionAxis) PURE;
-	virtual void OnCollisionExit(const D3DXVECTOR3* _vCollisionAxis) PURE;
+	virtual void OnCollisionStay(const D3DXVECTOR3 _vCollisionNormal) PURE;
+	virtual void OnCollisionEnter(const D3DXVECTOR3 _vCollisionAxis) PURE;
+	virtual void OnCollisionExit(const D3DXVECTOR3 _vCollisionAxis) PURE;
 
 
 	/**
@@ -108,6 +108,7 @@ public:
 	void		ResetDotsPos();
 
 	void LateUpdateOBB();
+
 protected:	
 	OBJ_ID_WYJ m_eID;
 

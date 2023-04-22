@@ -24,10 +24,12 @@ void CBall_WYJ::Release()
 {
 }
 
-void CBall_WYJ::OnCollisionStay(const D3DXVECTOR3* _vCollisionAxis)
+void CBall_WYJ::OnCollisionStay(const D3DXVECTOR3 _vCollisionNormal)
 {
 	m_tWorld.vPos -= m_vMoveDir * m_fSpeed;
-	m_vMoveDir *= -1;
+	float UdotV = D3DXVec3Dot(&-m_vMoveDir, &_vCollisionNormal);
+	D3DXVECTOR3 vTmp = UdotV * _vCollisionNormal * 2;
+	m_vMoveDir = m_vMoveDir + UdotV * _vCollisionNormal * 2;
 }
 
 void CBall_WYJ::UpdateMove()
