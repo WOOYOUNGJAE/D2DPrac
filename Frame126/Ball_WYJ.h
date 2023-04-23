@@ -3,9 +3,9 @@
 class CBall_WYJ : public CObj_WYJ
 {
 public:
-	CBall_WYJ()
+	CBall_WYJ() : m_iBallHP(10)
 	{
-		m_fSpeed = 10.f;
+		m_fSpeed = 5.f;
 		m_vMoveDir = { 0,-1,0 };
 		D3DXVec3Normalize(&m_vMoveDir, &m_vMoveDir);
 		m_eID = OBJ_WYJ_BALL;
@@ -37,5 +37,7 @@ public:
 
 	virtual void		UpdateMove() override;
 
+private:
+	int m_iBallHP;
 };
 

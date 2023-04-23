@@ -34,7 +34,35 @@ void CBrickBase::LateUpdate()
 
 void CBrickBase::Render(HDC hDC)
 {
-	CObj_WYJ::Render(hDC);
+
+	if (m_eType != BRICK_SIMPLE)
+		CObj_WYJ::Render(hDC);
+	else
+	{
+		HPEN hGreenPen;
+		HPEN hOldPen;
+		if (m_iBrickHP >= 3)
+		{
+			hGreenPen = CreatePen(PS_SOLID, 1, RGB(0, 255, 0)); // 초록색 펜 객체 생성
+			hOldPen = (HPEN)SelectObject(hDC, hGreenPen);			
+		}
+		else
+		{
+			hGreenPen = CreatePen(PS_SOLID, 1, RGB(255, 0, 0)); // 
+			hOldPen = (HPEN)SelectObject(hDC, hGreenPen);
+		}
+
+
+		MoveToEx(hDC, m_vDots[0].x, m_vDots[0].y, nullptr);
+
+		LineTo(hDC, m_vDots[1].x, m_vDots[1].y);
+		LineTo(hDC, m_vDots[2].x, m_vDots[2].y);
+		LineTo(hDC, m_vDots[3].x, m_vDots[3].y);
+		LineTo(hDC, m_vDots[0].x, m_vDots[0].y);
+
+		SelectObject(hDC, hOldPen); // DC에 초록색 펜 선택
+		DeleteObject(hGreenPen);
+	}
 }
 
 void CBrickBase::Release()

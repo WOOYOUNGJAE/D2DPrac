@@ -9,6 +9,9 @@ void CBall_WYJ::Initialize()
 
 bool CBall_WYJ::Update()
 {
+	if (m_iBallHP <= 0)
+		m_bAlive = false;
+
 	return CObj_WYJ::Update();
 }
 
@@ -19,7 +22,29 @@ void CBall_WYJ::LateUpdate()
 
 void CBall_WYJ::Render(HDC hDC)
 {
-	CObj_WYJ::Render(hDC);
+	if (m_iBallHP > 4)
+	{
+		MoveToEx(hDC, m_vDots[0].x, m_vDots[0].y, nullptr);
+		LineTo(hDC, m_vDots[1].x, m_vDots[1].y);
+		LineTo(hDC, m_vDots[2].x, m_vDots[2].y);
+		LineTo(hDC, m_vDots[3].x, m_vDots[3].y);
+		LineTo(hDC, m_vDots[0].x, m_vDots[0].y);		
+	}
+	else
+	{
+		HPEN hGreenPen = CreatePen(PS_SOLID, 1, RGB(255, 0, 0));
+		HPEN hOldPen = (HPEN)SelectObject(hDC, hGreenPen);;
+
+		MoveToEx(hDC, m_vDots[0].x, m_vDots[0].y, nullptr);
+
+		LineTo(hDC, m_vDots[1].x, m_vDots[1].y);
+		LineTo(hDC, m_vDots[2].x, m_vDots[2].y);
+		LineTo(hDC, m_vDots[3].x, m_vDots[3].y);
+		LineTo(hDC, m_vDots[0].x, m_vDots[0].y);
+
+		SelectObject(hDC, hOldPen); // DC에 초록색 펜 선택
+		DeleteObject(hGreenPen);
+	}
 }
 
 void CBall_WYJ::Release()
@@ -51,6 +76,8 @@ void CBall_WYJ::OnCollisionEnter(const D3DXVECTOR3 _vCollisionNormal, CObj_WYJ* 
 	{
 		//_pOther->Set_Alive(false);
 	}
+
+	--m_iBallHP;
 }
 
 
