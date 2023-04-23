@@ -20,13 +20,18 @@ public:
 	virtual void OnCollisionEnter_Legacy(CObj_WYJ* _pOther, DIR_WYJ _eDir, float _fDiffCX, float _fDiffCY) override;
 	virtual void OnCollisionExit_Legacy(CObj_WYJ* _pOther) override;
 
-	virtual void OnCollisionStay(const D3DXVECTOR3 _vCollisionNormal) override {};
-	virtual void OnCollisionEnter(const D3DXVECTOR3 _vCollisionAxis) override {};
-	virtual void OnCollisionExit(const D3DXVECTOR3 _vCollisionAxis) override {};
+	virtual void OnCollisionStay(const D3DXVECTOR3 _vCollisionNormal, CObj_WYJ* _pOther) override {};
+	virtual void OnCollisionEnter(const D3DXVECTOR3 _vCollisionNormal, CObj_WYJ* _pOther) override {};
+	virtual void OnCollisionExit(const D3DXVECTOR3 _vCollisionAxis, CObj_WYJ* _pOther) override {};
 
 	virtual void		UpdateMove() override;
 
 
 	// originals
 	void Key_Input();
+
+private:
+	D3DXVECTOR3 vFirePos;
+	float m_fPosinAngle;
+	float m_fPosinLength;
 };

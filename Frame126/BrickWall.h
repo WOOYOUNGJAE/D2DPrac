@@ -8,5 +8,6 @@ public:
 
 
 public:
+	bool Update() override;
 };
 

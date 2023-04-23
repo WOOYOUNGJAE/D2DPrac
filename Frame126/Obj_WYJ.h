@@ -7,6 +7,7 @@ enum OBJ_ID_WYJ
 {
 	OBJ_WYJ_PLAYER,
 	OBJ_WYJ_WALL,
+	OBJ_WYJ_BRICK,
 	OBJ_WYJ_BALL,
 	OBJ_ID_WYJ_END,
 };
@@ -59,11 +60,13 @@ public:
 
 	virtual const D3DXVECTOR3* Get_Dots(int* _pDotCount) { return m_vDots; }
 
+	virtual const float Get_Angle() { return m_fAngle; }
 	const bool Get_IsRectangle() { return m_bIsRectangle; }
 
 	virtual const float Get_OBBWidth() { return m_fOBBWidth; }
 	virtual const float Get_OBBHeight() { return m_fOBBHeight; }
 
+	virtual OBJ_ID_WYJ Get_ID() { return m_eID; }
 	//setter
 	virtual void Set_WorldPos(const D3DXVECTOR3& _vPos) { m_tWorld.vPos.x = _vPos.x; m_tWorld.vPos.y = _vPos.y; }
 	virtual void Set_WorldPos(const float _x, const float _y)
@@ -73,7 +76,18 @@ public:
 		m_tWorld.vScale.x = _x;
 		m_tWorld.vScale.y = _y;
 	}
-
+	virtual void Set_Angle(float _fAngle) { m_fAngle = _fAngle; }
+	virtual void Set_Alive(bool _b) { m_bAlive = _b; }
+	virtual void Set_MoveDir(const D3DXVECTOR3& _vDir)
+	{
+		m_vMoveDir.x = _vDir.x; m_vMoveDir.y = _vDir.y; m_vMoveDir.z = 0;
+		D3DXVec3Normalize(&m_vMoveDir, &m_vMoveDir);
+	}
+	virtual void Set_MoveDir(const float _x, const float _y)
+	{
+		m_vMoveDir.x = _x; m_vMoveDir.y = _y; m_vMoveDir.z = 0;
+		D3DXVec3Normalize(&m_vMoveDir, &m_vMoveDir);
+	}
 	virtual void		Initialize(void)PURE;
 	virtual bool		Update(void);
 	virtual void		LateUpdate(void);
@@ -84,9 +98,9 @@ public:
 	virtual void OnCollisionEnter_Legacy(CObj_WYJ* _pOther, DIR_WYJ _eDir, float _fDiffCX, float _fDiffCY)PURE;
 	virtual void OnCollisionExit_Legacy(CObj_WYJ* _pOther)PURE;
 
-	virtual void OnCollisionStay(const D3DXVECTOR3 _vCollisionNormal) PURE;
-	virtual void OnCollisionEnter(const D3DXVECTOR3 _vCollisionAxis) PURE;
-	virtual void OnCollisionExit(const D3DXVECTOR3 _vCollisionAxis) PURE;
+	virtual void OnCollisionStay(const D3DXVECTOR3 _vCollisionNormal, CObj_WYJ* _pOther) PURE;
+	virtual void OnCollisionEnter(const D3DXVECTOR3 _vCollisionNormal, CObj_WYJ* _pOther) PURE;
+	virtual void OnCollisionExit(const D3DXVECTOR3 _vCollisionAxis, CObj_WYJ* _pOther) PURE;
 
 
 	/**
@@ -130,7 +144,7 @@ protected:
 	/**
 	 * \brief x축과 이루는 각도
 	 */
-	float			m_fDeltaAngle;
+	float			m_fAngle;
 	/**
 	 * \brief 크기 배율. 기본1
 	 */

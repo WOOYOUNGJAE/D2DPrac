@@ -145,6 +145,8 @@ void CCollisionManager_WYJ::OBBCollisionStay(list<CObj_WYJ*> _Dst, list<CObj_WYJ
 	{
 		for (auto& Src : _Src)
 		{
+			
+
 			int iDotCount = 0;
 			const D3DXVECTOR3* pTmpDots = Dst->Get_Dots(&iDotCount);
 			D3DXVECTOR3 vLine{};
@@ -179,13 +181,46 @@ void CCollisionManager_WYJ::OBBCollisionStay(list<CObj_WYJ*> _Dst, list<CObj_WYJ
 			//	Dst의 네 선분과 교차점이 몇개인지 구한다.
 			// 3. 세 직선 중, 교차점이 단 한가지(교차점이 한가지이면 그 교차점은 Dst의 꼭지점)인 직선이 충돌 면()
 
+			D3DXVECTOR3 vCollidedNormal{0, 0, 0};
+			if (Src->Get_Angle() == 0) // 가로로 긴 업이 위
+			{
+				vCollidedNormal = D3DXVECTOR3(0, -1, 0);
+				Src->OnCollisionStay(vCollidedNormal, Dst);
+				Dst->OnCollisionStay(vCollidedNormal, Src);
+				continue;
+			}
+			else if (Src->Get_Angle() == 90)
+			{
+				vCollidedNormal = D3DXVECTOR3(1, 0, 0);
+				Src->OnCollisionStay(vCollidedNormal, Dst);
+				Dst->OnCollisionStay(vCollidedNormal, Src);
+				continue;
+			}
+			else if (Src->Get_Angle() == 180)
+			{
+				vCollidedNormal = D3DXVECTOR3(0, 1, 0);
+				Src->OnCollisionStay(vCollidedNormal, Dst);
+				Dst->OnCollisionStay(vCollidedNormal, Src);
+				continue;
+			}
+			else if (Src->Get_Angle() == 270)
+			{
+				vCollidedNormal = D3DXVECTOR3(-1, 0, 0);
+				Src->OnCollisionStay(vCollidedNormal, Dst);
+				Dst->OnCollisionStay(vCollidedNormal, Src);
+				continue;
+			}
+
+
+
+
+
 			D3DXVECTOR3 vDstCenter = Dst->Get_WorldPos();
 			D3DXVECTOR3 vSrcCenter = Src->Get_WorldPos();
 			D3DXVECTOR3 vNearest = pTmpDots[0];
-			D3DXVECTOR3 vPotential0{};
-			D3DXVECTOR3 vPotential1{};
+			D3DXVECTOR3 vPotential0 = pTmpDots[3];
+			D3DXVECTOR3 vPotential1 = pTmpDots[1];
 			D3DXVECTOR3 vRealCollided{};
-			D3DXVECTOR3 vCollidedNormal{};
 
 			float fNearestDistance = D3DXVec3Length(&(pTmpDots[0] - vDstCenter));
 			for (int i = 1; i < 4; ++i)
@@ -227,13 +262,42 @@ void CCollisionManager_WYJ::OBBCollisionStay(list<CObj_WYJ*> _Dst, list<CObj_WYJ
 			float m1 = (vPotential1.y - vNearest.y) / (vPotential1.x - vNearest.x);
 			float b1 = vNearest.y - m1 * vNearest.x;
 
-			float mCenterToDot = (vPotential0.y - vDstCenter.x) / (vPotential0.x - vDstCenter.x);
+			// potential 0
+			float mCenterToDot = (vPotential0.y - vDstCenter.y) / (vPotential0.x - vDstCenter.x);
 			float bCenterToDot = vDstCenter.y - mCenterToDot * vDstCenter.x;
 
-			// potential 0
 			// 두 x범위 사이의 해의 개수 구하기
 			if ((vNearest.x * mCenterToDot + bCenterToDot - vNearest.y) *
-				(vPotential0.x * mCenterToDot + bCenterToDot - vPotential0.y)
+				(vPotential0.x * mCenterToDot + bCenterToDot - (vPotential0.x * m0 + b0))
+				< 0.1f
+				) // 두 점 사이에 교차점이 있다.
+			{
+				vRealCollided = vPotential0 - vNearest;
+				D3DXVECTOR3 vMiddle = (vPotential0 + vNearest) * 0.5f;
+				vCollidedNormal = vMiddle - vSrcCenter;
+				D3DXVec3Normalize(&vCollidedNormal, &vCollidedNormal);
+				Src->OnCollisionStay(vCollidedNormal, Dst);
+				Dst->OnCollisionStay(vCollidedNormal, Src);
+				continue;
+			}
+			else
+			{
+				vRealCollided = vPotential1 - vNearest;
+				D3DXVECTOR3 vMiddle = (vPotential1 + vNearest) * 0.5f;
+				vCollidedNormal = vMiddle - vSrcCenter;
+				D3DXVec3Normalize(&vCollidedNormal, &vCollidedNormal);
+				Src->OnCollisionStay(vCollidedNormal, Dst);
+				Dst->OnCollisionStay(vCollidedNormal, Src);
+				continue;
+			}
+
+			// potential1
+			mCenterToDot = (vPotential1.y - vDstCenter.y) / (vPotential1.x - vDstCenter.x);
+			bCenterToDot = vDstCenter.y - mCenterToDot * vDstCenter.x;
+			
+
+			if ((vNearest.x * mCenterToDot + bCenterToDot - vNearest.y) *
+				(vPotential1.x * mCenterToDot + bCenterToDot - (vPotential1.x * m1 + b1))
 				< 0
 				) // 두 점 사이에 교차점이 있다.
 			{
@@ -243,23 +307,19 @@ void CCollisionManager_WYJ::OBBCollisionStay(list<CObj_WYJ*> _Dst, list<CObj_WYJ
 				D3DXVec3Normalize(&vCollidedNormal, &vCollidedNormal);
 			}
 
-			// potential1
-			mCenterToDot = (vPotential1.y - vDstCenter.x) / (vPotential1.x - vDstCenter.x);
-			bCenterToDot = vDstCenter.y - mCenterToDot * vDstCenter.x;
-
-			if ((vNearest.x * mCenterToDot + bCenterToDot - vNearest.y) *
-				(vPotential1.x * mCenterToDot + bCenterToDot - vPotential1.y)
-				< 0
-				) // 두 점 사이에 교차점이 있다.
+			if (vCollidedNormal == D3DXVECTOR3(0,0,0))
 			{
-				vRealCollided = vPotential1 - vNearest;
-				D3DXVECTOR3 vMiddle = (vPotential1 + vNearest) * 0.5f;
-				vCollidedNormal = vMiddle - vSrcCenter;
-				D3DXVec3Normalize(&vCollidedNormal, &vCollidedNormal);
+				// 면 대 면 끼리 만났을 때
+				D3DXVECTOR3 vSrcToDst = vDstCenter - vSrcCenter;
+				D3DXVec3Normalize(&vSrcToDst, &vSrcToDst);
+				D3DXVECTOR3 vSrcToNearest = vNearest - vSrcCenter;
+				D3DXVec3Normalize(&vSrcToNearest, &vSrcToNearest);
+
+
 			}
 
-			Src->OnCollisionStay(vCollidedNormal);
-			Dst->OnCollisionStay(vCollidedNormal);
+			Src->OnCollisionStay(vCollidedNormal, Dst);
+			Dst->OnCollisionStay(vCollidedNormal, Src);
 			continue;
 
 		}
@@ -268,10 +328,270 @@ void CCollisionManager_WYJ::OBBCollisionStay(list<CObj_WYJ*> _Dst, list<CObj_WYJ
 
 void CCollisionManager_WYJ::OBBCollisionEnter(list<CObj_WYJ*> _Dst, list<CObj_WYJ*> _Src)
 {
+	for (auto& Dst : _Dst)
+	{
+		for (auto& Src : _Src)
+		{
+			auto iter = find(m_CollisionEnterList.begin(), m_CollisionEnterList.end(),
+				pair<CObj_WYJ*, CObj_WYJ*>(Dst, Src));
+
+			// 찾았으면, 이미 충돌했으면 리턴
+			if (iter != m_CollisionEnterList.end())
+				return;
+
+			int iDotCount = 0;
+			const D3DXVECTOR3* pTmpDots = Dst->Get_Dots(&iDotCount);
+			D3DXVECTOR3 vLine{};
+			D3DXVECTOR3 vCollisionAxis{};
+
+			// 01
+			vLine = pTmpDots[1] - pTmpDots[0];
+			D3DXVec3Normalize(&vLine, &vLine);
+			if (SAT_Exist(vLine, Dst, Src))
+				continue;
+			// 32
+			vLine = pTmpDots[2] - pTmpDots[1];
+			D3DXVec3Normalize(&vLine, &vLine);
+			if (SAT_Exist(vLine, Dst, Src))
+				continue;
+
+			pTmpDots = Src->Get_Dots(&iDotCount);
+			// 01
+			vLine = pTmpDots[1] - pTmpDots[0];
+			D3DXVec3Normalize(&vLine, &vLine);
+			if (SAT_Exist(vLine, Src, Dst))
+				continue;
+			// 32
+			vLine = pTmpDots[2] - pTmpDots[1];
+			D3DXVec3Normalize(&vLine, &vLine);
+			if (SAT_Exist(vLine, Src, Dst))
+				continue;
+
+			// 충돌 감지 순간
+			m_CollisionEnterList.emplace_back(pair<CObj_WYJ*, CObj_WYJ*>(Dst, Src));
+			// 1. Src의 중점과 가장 가까운 Dst의 꼭지점을 찾는다. -> 충돌 선분의 한 점, 이하 vNearest
+			// 2.Src의 중점으로부터 vNearest의 양 옆의 점에 선을 그어서
+			//	Dst의 네 선분과 교차점이 몇개인지 구한다.
+			// 3. 세 직선 중, 교차점이 단 한가지(교차점이 한가지이면 그 교차점은 Dst의 꼭지점)인 직선이 충돌 면()
+
+			D3DXVECTOR3 vCollidedNormal{ 0, 0, 0 };
+			if (Src->Get_Angle() == 0) // 가로로 긴 업이 위
+			{
+				vCollidedNormal = D3DXVECTOR3(0, -1, 0);
+				Src->OnCollisionEnter(vCollidedNormal, Dst);
+				Dst->OnCollisionEnter(vCollidedNormal, Src);
+				continue;
+			}
+			else if (Src->Get_Angle() == 90)
+			{
+				vCollidedNormal = D3DXVECTOR3(1, 0, 0);
+				Src->OnCollisionEnter(vCollidedNormal, Dst);
+				Dst->OnCollisionEnter(vCollidedNormal, Src);
+				continue;
+			}
+			else if (Src->Get_Angle() == 180)
+			{
+				vCollidedNormal = D3DXVECTOR3(0, 1, 0);
+				Src->OnCollisionEnter(vCollidedNormal, Dst);
+				Dst->OnCollisionEnter(vCollidedNormal, Src);
+				continue;
+			}
+			else if (Src->Get_Angle() == 270)
+			{
+				vCollidedNormal = D3DXVECTOR3(-1, 0, 0);
+				Src->OnCollisionEnter(vCollidedNormal, Dst);
+				Dst->OnCollisionEnter(vCollidedNormal, Src);
+				continue;
+			}
+
+
+
+
+
+			D3DXVECTOR3 vDstCenter = Dst->Get_WorldPos();
+			D3DXVECTOR3 vSrcCenter = Src->Get_WorldPos();
+			D3DXVECTOR3 vNearest = pTmpDots[0];
+			D3DXVECTOR3 vPotential0 = pTmpDots[3];
+			D3DXVECTOR3 vPotential1 = pTmpDots[1];
+			D3DXVECTOR3 vRealCollided{};
+
+			float fNearestDistance = D3DXVec3Length(&(pTmpDots[0] - vDstCenter));
+			for (int i = 1; i < 4; ++i)
+			{
+				float fCurrentDistance = D3DXVec3Length(&(pTmpDots[i] - vDstCenter));
+				if (fCurrentDistance < fNearestDistance)
+				{
+					fNearestDistance = fCurrentDistance;
+					vNearest = pTmpDots[i];
+					switch (i)
+					{
+					case 0:
+						vPotential0 = pTmpDots[3];
+						vPotential1 = pTmpDots[1];
+						break;
+					case 1:
+						vPotential0 = pTmpDots[0];
+						vPotential1 = pTmpDots[2];
+						break;
+					case 2:
+						vPotential0 = pTmpDots[1];
+						vPotential1 = pTmpDots[3];
+						break;
+					case 3:
+						vPotential0 = pTmpDots[2];
+						vPotential1 = pTmpDots[0];
+						break;
+
+					default:
+						break;
+					}
+				}
+			}
+
+			// two lines
+			float m0 = (vPotential0.y - vNearest.y) / (vPotential0.x - vNearest.x);
+			float b0 = vNearest.y - m0 * vNearest.x;
+
+			float m1 = (vPotential1.y - vNearest.y) / (vPotential1.x - vNearest.x);
+			float b1 = vNearest.y - m1 * vNearest.x;
+
+			// potential 0
+			float mCenterToDot = (vPotential0.y - vDstCenter.y) / (vPotential0.x - vDstCenter.x);
+			float bCenterToDot = vDstCenter.y - mCenterToDot * vDstCenter.x;
+
+			// vs m1b1
+			float f0 = ((vNearest.x * mCenterToDot) + bCenterToDot) - (vNearest.x * m1 + b1);
+			float f1 = ((vPotential1.x * mCenterToDot) + bCenterToDot) - (vPotential1.x * m1 + b1);
+
+			float f = (vPotential0.x * mCenterToDot + bCenterToDot - (vPotential0.x * m0 + b0));
+
+			D3DXVECTOR3 vDstToNearest = vNearest - vDstCenter;
+			D3DXVec3Normalize(&vDstToNearest, &vDstToNearest);
+
+			D3DXVECTOR3 vDstToPotential = vPotential0 - vDstCenter;
+			D3DXVec3Normalize(&vDstToPotential, &vDstToPotential);
+
+			float fAngleP0 = acosf(D3DXVec3Dot(&vDstToNearest, &vDstToPotential));
+
+			vDstToPotential = vPotential1 - vDstCenter;
+			D3DXVec3Normalize(&vDstToPotential, &vDstToPotential);
+			float fAngleP1 = acosf(D3DXVec3Dot(&vDstToNearest, &vDstToPotential));
+
+			if (fAngleP0 > fAngleP1)
+			{
+				vRealCollided = vPotential0 - vNearest;
+				D3DXVECTOR3 vMiddle = (vPotential0 + vNearest) * 0.5f;
+				vCollidedNormal = vMiddle - vSrcCenter;
+				D3DXVec3Normalize(&vCollidedNormal, &vCollidedNormal);
+				Src->OnCollisionEnter(vCollidedNormal, Dst);
+				Dst->OnCollisionEnter(vCollidedNormal, Src);
+				continue;
+			}
+			else
+			{
+				vRealCollided = vPotential1 - vNearest;
+				D3DXVECTOR3 vMiddle = (vPotential1 + vNearest) * 0.5f;
+				vCollidedNormal = vMiddle - vSrcCenter;
+				D3DXVec3Normalize(&vCollidedNormal, &vCollidedNormal);
+				Src->OnCollisionEnter(vCollidedNormal, Dst);
+				Dst->OnCollisionEnter(vCollidedNormal, Src);
+				continue;
+				
+			}
+			//if (fabs(f)  < 0.01f)
+			//	f = 0;
+
+			// 두 x범위 사이의 해의 개수 구하기
+			if ( 
+				//(vNearest.x * mCenterToDot + bCenterToDot - vNearest.y) * f
+				////(vPotential0.x * mCenterToDot + bCenterToDot - (vPotential0.x * m0 + b0))
+				//< 0.f
+
+				f0 * f1 < 0.f
+				) // 두 점 사이에 교차점이 있다.
+			{
+				vRealCollided = vPotential0 - vNearest;
+				D3DXVECTOR3 vMiddle = (vPotential0 + vNearest) * 0.5f;
+				vCollidedNormal = vMiddle - vSrcCenter;
+				D3DXVec3Normalize(&vCollidedNormal, &vCollidedNormal);
+				Src->OnCollisionEnter(vCollidedNormal, Dst);
+				Dst->OnCollisionEnter(vCollidedNormal, Src);
+				continue;
+			}
+			else
+			{
+				vRealCollided = vPotential1 - vNearest;
+				D3DXVECTOR3 vMiddle = (vPotential1 + vNearest) * 0.5f;
+				vCollidedNormal = vMiddle - vSrcCenter;
+				D3DXVec3Normalize(&vCollidedNormal, &vCollidedNormal);
+				Src->OnCollisionEnter(vCollidedNormal, Dst);
+				Dst->OnCollisionEnter(vCollidedNormal, Src);
+				continue;
+			}
+		}
+	}
 }
 
 void CCollisionManager_WYJ::OBBCollisionExit(list<CObj_WYJ*> _Dst, list<CObj_WYJ*> _Src)
 {
+	for (auto& Dst : _Dst)
+	{
+		for (auto& Src : _Src)
+		{
+			auto iter = find(m_CollisionEnterList.begin(), m_CollisionEnterList.end(),
+				pair<CObj_WYJ*, CObj_WYJ*>(Dst, Src));
+
+			// 못찾았으면,  리턴
+			if (iter == m_CollisionEnterList.end())
+				continue;
+
+			//------------
+			int iDotCount = 0;
+			const D3DXVECTOR3* pTmpDots = Dst->Get_Dots(&iDotCount);
+			D3DXVECTOR3 vLine{};
+			D3DXVECTOR3 vCollisionAxis{};
+
+			// 01
+			vLine = pTmpDots[1] - pTmpDots[0];
+			D3DXVec3Normalize(&vLine, &vLine);
+			if (SAT_Exist(vLine, Dst, Src))
+			{
+				m_CollisionEnterList.erase(iter);
+				continue;
+			}
+			// 32
+			vLine = pTmpDots[2] - pTmpDots[1];
+			D3DXVec3Normalize(&vLine, &vLine);
+			if (SAT_Exist(vLine, Dst, Src))
+			{
+				m_CollisionEnterList.erase(iter);
+				continue;
+			}
+
+			pTmpDots = Src->Get_Dots(&iDotCount);
+			// 01
+			vLine = pTmpDots[1] - pTmpDots[0];
+			D3DXVec3Normalize(&vLine, &vLine);
+			if (SAT_Exist(vLine, Src, Dst))
+			{
+				m_CollisionEnterList.erase(iter);
+				continue;
+			}
+			// 32
+			vLine = pTmpDots[2] - pTmpDots[1];
+			D3DXVec3Normalize(&vLine, &vLine);
+			if (SAT_Exist(vLine, Src, Dst))
+			{
+				m_CollisionEnterList.erase(iter);
+				continue;
+			}
+
+
+
+
+			
+		}
+	}
 }
 
 bool CCollisionManager_WYJ::CheckRect(CObj_WYJ* _pDst, CObj_WYJ* _pSrc, float* pDiffCX, float* pDiffCY)

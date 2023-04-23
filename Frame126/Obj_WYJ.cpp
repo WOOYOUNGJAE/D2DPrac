@@ -1,7 +1,7 @@
 #include "stdafx.h"
 #include "Obj_WYJ.h"
 
-CObj_WYJ::CObj_WYJ() : m_fSpeed(0.f), m_fDeltaAngle(0.f), m_fDeltaScale(1.f),
+CObj_WYJ::CObj_WYJ() : m_fSpeed(0.f), m_fAngle(0.f), m_fDeltaScale(1.f),
 m_eID(OBJ_ID_WYJ_END), m_bAlive(true), m_fOBBWidth(0.f), m_fOBBHeight(0.f), m_bIsRectangle(true)
 {
 	D3DXMatrixIdentity(&m_tMats.matWorld);
@@ -108,7 +108,7 @@ void CObj_WYJ::UpdateWorldScale()
 
 void CObj_WYJ::UpdateWorldRotation()
 {
-	D3DXMatrixRotationZ(&m_tMats.matRotation, D3DXToRadian(m_fDeltaAngle));
+	D3DXMatrixRotationZ(&m_tMats.matRotation, D3DXToRadian(m_fAngle));
 
 	m_tMats.matWorld *= m_tMats.matRotation;
 }

@@ -49,8 +49,12 @@ void CObjManager_WYJ::LateUpdate()
 		}
 	}
 
-	CCollisionManager_WYJ::Get_Instance()->OBBCollisionStay(m_ObjList[OBJ_WYJ_BALL], m_ObjList[OBJ_WYJ_WALL]); 
+	//CCollisionManager_WYJ::Get_Instance()->OBBCollisionStay(m_ObjList[OBJ_WYJ_BALL], m_ObjList[OBJ_WYJ_WALL]); 
+	CCollisionManager_WYJ::Get_Instance()->OBBCollisionStay(m_ObjList[OBJ_WYJ_BALL], m_ObjList[OBJ_WYJ_BRICK]); 
+	CCollisionManager_WYJ::Get_Instance()->OBBCollisionStay(m_ObjList[OBJ_WYJ_BALL], m_ObjList[OBJ_WYJ_PLAYER]); 
 	
+	CCollisionManager_WYJ::Get_Instance()->OBBCollisionEnter(m_ObjList[OBJ_WYJ_BALL], m_ObjList[OBJ_WYJ_WALL]); 
+	CCollisionManager_WYJ::Get_Instance()->OBBCollisionExit(m_ObjList[OBJ_WYJ_BALL], m_ObjList[OBJ_WYJ_WALL]); 
 }	
 
 void CObjManager_WYJ::Render(HDC _dc)
